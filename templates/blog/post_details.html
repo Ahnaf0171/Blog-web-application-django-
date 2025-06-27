@@ -1,0 +1,55 @@
+{% extends "blog/base.html" %}
+{%block title%}
+{{post.title}}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h2>{{ post.title }}</h2>
+    <small>
+        By {{ post.author }} on {{ post.created_at }}
+    </small>
+    <p>{{ post.content}}</p>
+    {% if is_liked %}
+        <a class="btn btn-sm btn-primary" href="{% url 'like_post' post.id %}">
+            liked
+        </a>
+    {% else %}
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'like_post' post.id %}">
+            like
+        </a>
+    {% endif %}
+    <span class="badge badge-pill badge-success"> Like count: {{ like_count }} </span>
+        
+    <span class="badge badge-pill badge-primary"> Views: {{ post.view_count }} </span>
+
+    {%if user == post.author %}
+        <a class='nav-link' href="{% url 'update_post' post.id %}">Edit Post</a>
+        <a class='nav-link' href="{% url 'delete_post' post.id %}">Delete Post</a>
+    {%endif %}
+</div>
+<div class="container border">
+    <h3>Comments:</h3>
+    {% if user.is_authenticated %}
+    <form method="POST">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <div class="d-grid gap-2">
+            <button class="btn btn-primary" type="submit">Add Comment</button>
+        </div>
+    </form>
+    {% else %}
+    <p>You must login for comment</p>
+    {% endif %}
+    {% for comment in comments %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{comment.author}}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">{{comment.created_at}}</h6>
+            <p class="card-text">{{comment.content}}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
